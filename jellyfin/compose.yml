@@ -1,0 +1,25 @@
+services:
+  jellyfin:
+    container_name: jellyfin
+    image: jellyfin/jellyfin:latest
+    restart: unless-stopped
+    environment:
+      TZ: Europe/London
+    volumes:
+      - ./config:/config
+      - /mnt/media:/media
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jellyfin.rule=Host(`${DOMAIN}`)'
+      - 'traefik.http.routers.jellyfin.entryPoints=websecure'
+      - 'traefik.http.routers.jellyfin.tls.certresolver=letsencrypt'
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+
