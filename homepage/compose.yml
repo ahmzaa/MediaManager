@@ -1,0 +1,26 @@
+# homepage is a highly customisable application dashboard
+# 12/03/2025
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Allow homepage to see docker container status
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: cp.${DOMAIN}
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`cp.${DOMAIN}`)"
+      - "traefik.http.routers.homepage.entryPoints=websecure"
+      - "traefik.http.routers.homepage.tls.certresolver=myresolver"
+      - "traefik.http.routers.homepage.middlewares=authelia@docker"
+
+networks:
+  proxy:
+    external: true
