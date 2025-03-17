@@ -1,0 +1,4 @@
+.env
+letsencrypt/
+config/dynamic.yml
+config/traefik.yml
