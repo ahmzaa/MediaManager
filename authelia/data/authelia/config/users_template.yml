@@ -1,0 +1,21 @@
+# yamllint disable rule:line-length
+---
+###############################################################
+#                         Users Database                      #
+###############################################################
+
+# This file can be used if you do not have an LDAP set up.
+
+users:
+  ahmza:
+    disabled: false
+    displayname: "user1"
+    # Use the following command to generate a password for the user:
+    # docker run authelia/authelia:latest authelia crypto hash generate argon2 --password 'your passwd'
+    password: ""
+    email: mail@example.com
+    groups:
+      - admins
+      - dev
+...
+# yamllint enable rule:line-length

@@ -1,0 +1,68 @@
+---
+server:
+  address: "tcp://:9091/"
+
+log:
+  level: "debug"
+
+identity_validation:
+  elevated_session:
+    require_second_factor: true
+  reset_password:
+    jwt_secret: {{ secret "/secrets/JWT_SECRET" | mindent 0 "|" | msquote }} 
+
+totp:
+  disable: false
+  issuer: "authelia.com"
+  period: 30
+  skew: 1
+
+password_policy:
+  zxcvbn:
+    enabled: true
+    min_score: 4
+
+authentication_backend:
+  file:
+    path: "/config/users.yml"
+    password:
+      algorithm: "argon2"
+      argon2:
+        variant: "argon2id"
+        iterations: 3
+        memory: 65536
+        parallelism: 4
+        key_length: 32
+        salt_length: 16
+
+access_control:
+  default_policy: "deny"
+  rules:
+    - domain: "mediamanager.example.com"
+      policy: "one_factor"
+    - domain: "whoami.example.com"
+      policy: "one_factor"
+    - domain: "cp.example.com"
+      policy: "one_factor"
+
+session:
+  name: "authelia_session"
+  secret: {{ secret "/secrets/SESSION_SECRET" | mindent 0 "|" | msquote }}
+  cookies:
+    - domain: "example.com"
+      authelia_url: "https://auth.example.com"
+
+regulation:
+  max_retries: 3
+  find_time: "2 minutes"
+  ban_time: "5 minutes"
+
+storage:
+  encryption_key: {{ secret "/secrets/STORAGE_ENCRYPTION_KEY" | mindent 0 "|" | msquote }}
+  local:
+    path: "/config/db.sqlite3"
+
+notifier:
+  disable_startup_check: false
+  filesystem:
+    filename: /config/notification.txt

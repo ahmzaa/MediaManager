@@ -1,0 +1,48 @@
+# Authelia is an authentication and authorization server and portal
+# 15/03/2025
+
+services:
+
+  #  authelia_redis:
+  #    image: redis
+  #    container_name: authelia_redis
+  #  restart: unless-stopped
+  #  networks:
+  #    - authelia
+
+  authelia_generate_secrets:
+    build: generate_secrets
+    volumes:
+      - './data/authelia/secrets:/secrets'
+
+  authelia:
+    container_name: 'authelia'
+    image: 'docker.io/authelia/authelia:latest'
+    restart: 'unless-stopped'
+    networks:
+      - authelia
+      - proxy
+    expose:
+      - 9091
+    environment:
+      TZ: "Europe/London"
+      X_AUTHELIA_CONFIG_FILTERS: "template"
+    volumes:
+      - './data/authelia/config:/config'
+      - './data/authelia/secrets:/secrets'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(`auth.${DOMAIN}`)"
+      - "traefik.http.routers.authelia.entryPoints=websecure"
+      - "traefik.http.routers.authelia.tls.certresolver=letsencrypt"
+      - "traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/authz/forward-auth"
+      - "traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name"
+    depends_on:
+      authelia_generate_secrets:
+        condition: service_completed_successfully
+networks:
+  authelia:
+    external: true
+  proxy:
+    external: true

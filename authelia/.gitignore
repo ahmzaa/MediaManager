@@ -1,0 +1,6 @@
+.env
+data/authelia/secrets
+data/authelia/config/db.sqlite3
+data/authelia/config/notification.txt
+data/authelia/config/configuration.yml
+data/authelia/config/users.yml
