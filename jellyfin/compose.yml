@@ -13,7 +13,7 @@ services:
       - /dev/dri/card0:/dev/dri/card0
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.jellyfin.rule=Host(`${DOMAIN}`)'
+      - 'traefik.http.routers.jellyfin.rule=Host(`jellyfin2.${DOMAIN}`)'
       - 'traefik.http.routers.jellyfin.entryPoints=websecure'
       - 'traefik.http.routers.jellyfin.tls.certresolver=letsencrypt'
     networks:
