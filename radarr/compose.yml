@@ -1,0 +1,25 @@
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    networks:
+      - proxy
+    volumes:
+      - ./config:/config
+      - /mnt/media/Movies:/movies #optional
+      - /mnt/media/Downloads:/downloads #optional
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)'
+      - 'traefik.http.routers.radarr.entryPoints=websecure'
+      - 'traefik.http.routers.radarr.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.radarr.middlewares=authelia@docker'
+
+networks:
+  proxy:
+    external: true
