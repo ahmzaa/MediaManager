@@ -1,0 +1,25 @@
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./config:/config
+      - /mnt/media/TV:/tv #optional
+      - /mnt/media/Downloads:/downloads #optional
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)"
+      - "traefik.http.routers.sonarr.entryPoints=websecure"
+      - "traefik.http.routers.sonarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.sonarr.middlewares=authelia@docker"
+
+networks:
+  proxy:
+    external: true
