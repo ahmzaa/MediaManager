@@ -1,0 +1,27 @@
+services:
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config:/config
+      - /mnt/media/Downloads:/downloads #optional
+    networks:
+      - proxy
+      - wgnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.${DOMAIN}`)"
+      - "traefik.http.routers.sabnzbd.entryPoints=websecure"
+      - "traefik.http.routers.sabnzbd.tls.certresolver=myresolver"
+      - "traefik.http.routers.sabnzbd.middlewares=authelia@docker"
+
+networks:
+  proxy:
+    external: true
+  wgnet:
+    external: true
