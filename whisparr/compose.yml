@@ -1,0 +1,25 @@
+services:
+  whisparr:
+    container_name: whisparr
+    image: ghcr.io/hotio/whisparr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=Europe/London
+    volumes:
+      - ./config:/config
+      - /mnt/media/:/data
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whisparr.rule=Host(`whisparr.${DOMAIN}`)"
+      - "traefik.http.routers.whisparr.entryPoints=websecure"
+      - "traefik.http.routers.whisparr.tls.certresolver=myresolver"
+      - "traefik.http.routers.whisparr.middlewares=authelia@docker"
+
+networks:
+  proxy:
+    external: true
