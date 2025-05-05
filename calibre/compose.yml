@@ -1,0 +1,51 @@
+---
+services:
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./config/calibre:/config
+      - /mnt/media/Books:/books
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre.rule=Host(`calibre.${DOMAIN}`)"
+      - "traefik.http.routers.calibre.entryPoints=websecure"
+      - "traefik.http.routers.calibre.tls.certresolver=myresolver"
+      - "traefik.http.routers.calibre.middlewares=authelia@docker"
+      - "traefik.http.services.calibre.loadbalancer.server.port=8080"
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - ./config/web:/config
+      - /mnt/media/Books:/books
+      - ./config:/calibre
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre-web.rule=Host(`books.${DOMAIN}`)"
+      - "traefik.http.routers.calibre-web.entryPoints=websecure"
+      - "traefik.http.routers.calibre-web.tls.certresolver=myresolver"
+      # - "traefik.http.routers.calibre-web.middlewares=authelia@docker"
+
+networks:
+  proxy:
+    external: true
