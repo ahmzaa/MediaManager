@@ -10,13 +10,17 @@ services:
       - TZ=Europe/London
     volumes:
       - ./config:/config
-      - /mnt/Media/Books:/books #optional
-      - /mnt/Media/Downloads:/downloads #optional
+      - /home/ahmza/services/calibre/config/calibre/Calibre:/books #optional
+      - /mnt/media/Downloads:/downloads #optional
     networks:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.homepage.rule=Host(`readarr.${DOMAIN}`)"
-      - "traefik.http.routers.homepage.entryPoints=websecure"
-      - "traefik.http.routers.homepage.tls.certresolver=myresolver"
-      - "traefik.http.routers.homepage.middlewares=authelia@docker"
+      - "traefik.http.routers.readarr.rule=Host(`readarr.${DOMAIN}`)"
+      - "traefik.http.routers.readarr.entryPoints=websecure"
+      - "traefik.http.routers.readarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.readarr.middlewares=authelia@docker"
+
+networks:
+  proxy:
+    external: true
